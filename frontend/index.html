@@ -1,0 +1,2492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solar Energy Forecasting</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
+
+  <style>
+    /* ==========================================================================
+   SOLAR ENERGY FORECASTING DESIGN SYSTEM & CYBER-ENERGY TOKENS
+   ========================================================================== */
+    :root {
+      --bg-dark: #070a12;
+      --bg-surface: #0c1220;
+      --bg-surface-elevated: #111a2e;
+      --panel-bg: rgba(15, 23, 42, 0.72);
+      --panel-border: rgba(56, 189, 248, 0.14);
+      --panel-border-glow: rgba(56, 189, 248, 0.35);
+
+      --solar-gold: #ffb703;
+      --solar-gold-glow: rgba(255, 183, 3, 0.35);
+      --cyan-accent: #00f2fe;
+      --cyan-glow: rgba(0, 242, 254, 0.3);
+      --emerald-battery: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.3);
+      --coral-grid: #ff4d4d;
+      --coral-glow: rgba(255, 77, 77, 0.3);
+      --violet-ai: #a855f7;
+      --violet-glow: rgba(168, 85, 247, 0.3);
+
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --text-muted: #64748b;
+
+      --font-display: 'Outfit', sans-serif;
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --radius-xl: 20px;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+
+      --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 0%, #13223f 0%, var(--bg-dark) 65%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      padding: 16px 24px 60px;
+      overflow-x: hidden;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(7, 10, 18, 0.8);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+
+    /* ==========================================================================
+   LAYOUT CONTAINERS & HEADER
+   ========================================================================== */
+    .ems-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Top Navigation Bar */
+    .top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--panel-border);
+      padding: 14px 22px;
+      border-radius: var(--radius-xl);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--solar-gold), #fb8500, var(--cyan-accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 22px;
+      color: #050811;
+      box-shadow: 0 0 25px var(--solar-gold-glow);
+    }
+
+    .brand-text h1 {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #ffffff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text .status-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--emerald-battery);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .pulse-led {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--emerald-battery);
+      box-shadow: 0 0 10px var(--emerald-battery);
+      animation: pulseLed 2s infinite;
+    }
+
+    @keyframes pulseLed {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.4;
+        transform: scale(0.85);
+      }
+    }
+
+    /* Location Bar & Geolocation Controls */
+    .location-hud {
+      display: flex;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--panel-border-glow);
+      padding: 6px 14px;
+      border-radius: var(--radius-lg);
+      gap: 12px;
+    }
+
+    .loc-pin {
+      color: var(--cyan-accent);
+      display: flex;
+      align-items: center;
+    }
+
+    .loc-meta {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .loc-city {
+      font-family: var(--font-display);
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .loc-coords {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--text-sub);
+    }
+
+    .loc-btn {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--cyan-accent);
+      padding: 6px 12px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition-smooth);
+    }
+
+    .loc-btn:hover {
+      background: var(--cyan-accent);
+      color: #070a12;
+      box-shadow: 0 0 15px var(--cyan-glow);
+    }
+
+    /* Top Action Buttons */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .action-chip-btn {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--panel-border);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: var(--transition-smooth);
+    }
+
+    .action-chip-btn:hover {
+      border-color: var(--solar-gold);
+      color: var(--solar-gold);
+    }
+
+    .action-chip-btn.active {
+      background: linear-gradient(135deg, var(--solar-gold), #f59e0b);
+      color: #070a12;
+      border-color: transparent;
+      box-shadow: 0 0 20px var(--solar-gold-glow);
+    }
+
+    /* ==========================================================================
+   LOCATION SEARCH & PRESETS MODAL / DRAWER
+   ========================================================================== */
+    .location-selector-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      padding: 10px 18px;
+      border-radius: var(--radius-lg);
+      flex-wrap: wrap;
+    }
+
+    .search-input-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 260px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-md);
+      padding: 8px 14px 8px 36px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      color: #fff;
+      outline: none;
+      transition: var(--transition-smooth);
+    }
+
+    .search-input:focus {
+      border-color: var(--cyan-accent);
+      box-shadow: 0 0 15px var(--cyan-glow);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+
+    .presets-list {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .preset-chip {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid var(--panel-border);
+      color: var(--text-sub);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-family: var(--font-sans);
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: var(--transition-smooth);
+    }
+
+    .preset-chip:hover,
+    .preset-chip.active {
+      background: rgba(0, 242, 254, 0.15);
+      border-color: var(--cyan-accent);
+      color: #fff;
+    }
+
+    /* ==========================================================================
+   EXECUTIVE KPI METRIC CARDS
+   ========================================================================== */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    }
+
+    .kpi-card {
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition-smooth);
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--panel-border-glow);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--card-accent, var(--cyan-accent));
+    }
+
+    .kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .kpi-title {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-sub);
+    }
+
+    .kpi-icon-wrap {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--card-accent, var(--cyan-accent));
+    }
+
+    .kpi-value-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .kpi-value {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .kpi-unit {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    .kpi-subtext {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* ==========================================================================
+   NAVIGATION TABS
+   ========================================================================== */
+    .tabs-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--panel-border);
+      padding-bottom: 4px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-sub);
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+      cursor: pointer;
+      position: relative;
+      transition: var(--transition-smooth);
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+    }
+
+    .tab-btn.active {
+      color: var(--cyan-accent);
+      background: rgba(15, 23, 42, 0.6);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--cyan-accent);
+      box-shadow: 0 0 10px var(--cyan-accent);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ==========================================================================
+   MAIN DASHBOARD GRID (OVERVIEW TAB)
+   ========================================================================== */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 18px;
+    }
+
+    /* Hero Sky Arc / Sun Tracking View */
+    .sky-hero-panel {
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+
+    .sky-svg-container {
+      width: 100%;
+      height: 280px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #skyCanvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .sky-overlay-stats {
+      position: absolute;
+      bottom: 14px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      pointer-events: none;
+    }
+
+    .sky-time-badge {
+      background: rgba(10, 15, 29, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--panel-border-glow);
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sky-time-text {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .sky-irradiance-badge {
+      background: rgba(10, 15, 29, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 183, 3, 0.35);
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      text-align: right;
+    }
+
+    .sky-irradiance-val {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--solar-gold);
+    }
+
+    /* Dynamic Energy Flow Node Canvas */
+    .flow-panel {
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      margin-top: 18px;
+    }
+
+    .flow-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .flow-matrix {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      position: relative;
+    }
+
+    .node-box {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      padding: 16px 12px;
+      text-align: center;
+      position: relative;
+      transition: var(--transition-smooth);
+    }
+
+    .node-box.active {
+      border-color: var(--node-color, var(--cyan-accent));
+      box-shadow: 0 0 20px var(--node-glow, var(--cyan-glow));
+    }
+
+    .node-icon {
+      width: 42px;
+      height: 42px;
+      margin: 0 auto 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: var(--node-color, #fff);
+    }
+
+    .node-label {
+      font-family: var(--font-sans);
+      font-size: 11.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-sub);
+    }
+
+    .node-power {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 4px;
+    }
+
+    /* ==========================================================================
+   WEATHER & MANUAL OVERRIDE CONTROLS PANEL
+   ========================================================================== */
+    .controls-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .control-panel {
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+    }
+
+    .panel-heading {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .override-badge {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255, 183, 3, 0.15);
+      color: var(--solar-gold);
+      border: 1px solid rgba(255, 183, 3, 0.3);
+    }
+
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .slider-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .slider-top-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-sub);
+      font-weight: 500;
+    }
+
+    .slider-top-val {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .custom-range {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 5px;
+      border-radius: 5px;
+      background: #1e293b;
+      outline: none;
+    }
+
+    .custom-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--cyan-accent);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--cyan-accent);
+      transition: var(--transition-smooth);
+    }
+
+    .custom-range::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .resync-btn {
+      width: 100%;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid var(--emerald-battery);
+      color: var(--emerald-battery);
+      padding: 10px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 14px;
+      transition: var(--transition-smooth);
+    }
+
+    .resync-btn:hover {
+      background: var(--emerald-battery);
+      color: #070a12;
+      box-shadow: 0 0 20px var(--emerald-glow);
+    }
+
+    /* ==========================================================================
+   CHARTS & TELEMETRY SECTION
+   ========================================================================== */
+    .chart-card {
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      margin-top: 18px;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .chart-canvas-wrap {
+      position: relative;
+      height: 280px;
+      width: 100%;
+    }
+
+    /* Battery Visualizer */
+    .battery-viz-card {
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+    }
+
+    .bess-rack {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .bess-cell-outer {
+      width: 60px;
+      height: 100px;
+      border: 3px solid #334155;
+      border-radius: 8px;
+      position: relative;
+      padding: 3px;
+      background: #090d16;
+    }
+
+    .bess-cell-outer::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 22px;
+      height: 6px;
+      background: #475569;
+      border-radius: 3px 3px 0 0;
+    }
+
+    .bess-liquid {
+      position: absolute;
+      bottom: 3px;
+      left: 3px;
+      right: 3px;
+      height: 65%;
+      background: linear-gradient(180deg, var(--emerald-battery), #059669);
+      border-radius: 4px;
+      transition: height 0.8s ease, background 0.8s ease;
+    }
+
+    .bess-liquid.discharging {
+      background: linear-gradient(180deg, var(--solar-gold), #d97706);
+    }
+
+    .bess-liquid.low {
+      background: linear-gradient(180deg, var(--coral-grid), #b91c1c);
+    }
+
+    .bess-info {
+      flex: 1;
+    }
+
+    .bess-soc-pct {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    /* Responsive Rules */
+    @media (max-width: 1024px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-matrix {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+
+      .top-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    /* Solar Energy Forecasting visual upgrade: layered, editorial, Pinterest-inspired surfaces */
+    :root { --shadow-deep: 0 24px 70px rgba(0,0,0,.34); }
+    body::before { content: ''; position: fixed; inset: 0; pointer-events: none; opacity: .16; z-index: -1; background-image: radial-gradient(rgba(255,255,255,.22) .6px, transparent .6px); background-size: 5px 5px; mask-image: linear-gradient(to bottom, black, transparent 88%); }
+    .ems-container { animation: shellIn .7s cubic-bezier(.2,.8,.2,1) both; }
+    .kpi-card, .control-panel, .location-selector-bar, .hero-panel, .forecast-card { box-shadow: var(--shadow-deep); }
+    .kpi-card::after, .control-panel::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(135deg, rgba(255,255,255,.09), transparent 35%); opacity: .65; }
+    .kpi-card:hover { transform: translateY(-6px) scale(1.01); }
+    .panel-heading { position: relative; }
+    .panel-heading::after { content: ''; height: 2px; width: 44px; position: absolute; left: 0; bottom: -7px; background: linear-gradient(90deg, var(--solar-gold), transparent); }
+    .preset-chip, .action-chip-btn, button { will-change: transform; }
+    .preset-chip:active, .action-chip-btn:active, button:active { transform: scale(.96); }
+    .toast { position: fixed; right: 22px; bottom: 22px; z-index: 40; max-width: 330px; padding: 13px 16px; border: 1px solid rgba(0,242,254,.35); border-radius: 14px; color: #e6fbff; background: rgba(9,17,32,.92); backdrop-filter: blur(16px); box-shadow: 0 12px 34px rgba(0,0,0,.4), 0 0 24px rgba(0,242,254,.12); transform: translateY(18px); opacity: 0; pointer-events: none; transition: .28s ease; font-size: 12px; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .weather-ai-panel { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(260px, .85fr); gap: 18px; align-items: stretch; }
+    .weather-upload-zone { background: linear-gradient(135deg, rgba(0,242,254,.09), rgba(168,85,247,.08)); border: 1px dashed rgba(0,242,254,.45); border-radius: var(--radius-xl); padding: 20px; display: flex; flex-direction: column; justify-content: center; gap: 12px; min-height: 150px; transition: var(--transition-smooth); }
+    .weather-upload-zone.dragging { border-color: var(--solar-gold); background: rgba(255,183,3,.12); transform: translateY(-2px); }
+    .weather-upload-title { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: #fff; }
+    .weather-upload-copy { color: var(--text-sub); font-size: 12px; line-height: 1.5; }
+    .weather-upload-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .weather-upload-button { background: var(--cyan-accent); color: #06111c; border: 0; border-radius: var(--radius-md); padding: 10px 14px; font-weight: 800; cursor: pointer; }
+    .weather-file-name { color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; overflow-wrap: anywhere; }
+    .weather-ai-result { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: var(--radius-xl); padding: 20px; display: grid; grid-template-columns: 92px 1fr; gap: 14px; align-items: center; }
+    .weather-ai-preview { width: 92px; height: 92px; border-radius: var(--radius-md); object-fit: cover; border: 1px solid var(--panel-border-glow); display: none; }
+    .weather-ai-result-copy { display: flex; flex-direction: column; justify-content: center; gap: 7px; min-width: 0; }
+    .weather-ai-label { color: var(--text-sub); text-transform: uppercase; font: 600 10px var(--font-mono); letter-spacing: 1px; }
+    .weather-ai-class { color: var(--solar-gold); font: 800 27px var(--font-display); text-transform: capitalize; }
+    .weather-ai-meta { color: var(--text-sub); font-size: 12px; }
+    .weather-solar-estimate { grid-column: 1 / -1; margin-top: 4px; padding: 12px 14px; border: 1px solid rgba(255,183,3,.65); border-radius: var(--radius-md); background: linear-gradient(100deg, rgba(255,183,3,.2), rgba(255,183,3,.06)); box-shadow: 0 0 22px rgba(255,183,3,.16); }
+    .weather-solar-estimate-label { color: var(--solar-gold); font: 700 10px var(--font-mono); letter-spacing: .8px; text-transform: uppercase; }
+    .weather-solar-estimate-values { display: flex; align-items: baseline; gap: 14px; margin-top: 3px; flex-wrap: wrap; }
+    .weather-solar-current { color: #fff; font: 900 25px var(--font-display); }
+    .weather-solar-day { color: #ffe08a; font: 700 13px var(--font-mono); }
+    @media (max-width: 760px) { .weather-ai-panel { grid-template-columns: 1fr; } }
+    @keyframes shellIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+    @media (max-width: 720px) { .toast { left: 16px; right: 16px; bottom: 16px; max-width: none; } .kpi-grid { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+
+<body>
+
+  <div class="ems-container">
+
+    <!-- TOP APP HEADER -->
+    <header class="top-header">
+      <div class="brand-section">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-text">
+          <h1>Solar Energy Forecasting</h1>
+          <div class="status-tag">
+          
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Location HUD -->
+      <div class="location-hud">
+        <div class="loc-pin">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+        </div>
+        <div class="loc-meta">
+          <div class="loc-city" id="currentCityName">Detecting Location…</div>
+          <div class="loc-coords" id="currentCoords">GPS: --.--° N, --.--° E</div>
+        </div>
+        <button class="loc-btn" id="gpsDetectBtn" title="Detect Exact GPS Location">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="22" y1="12" x2="18" y2="12"></line>
+            <line x1="6" y1="12" x2="2" y2="12"></line>
+            <line x1="12" y1="6" x2="12" y2="2"></line>
+            <line x1="12" y1="22" x2="12" y2="18"></line>
+          </svg>
+          My GPS
+        </button>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="header-actions">
+        <button class="action-chip-btn" id="downloadPdfBtn" title="Download System Parameters & Technical Manual">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          PDF Manual
+        </button>
+        <button class="action-chip-btn" id="exportCsvBtn" title="Export 24-Hour Telemetry Ledger">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Export CSV
+        </button>
+      </div>
+    </header>
+
+    <!-- SEARCH & PRESET LOCATION SELECTOR -->
+    <section class="location-selector-bar">
+      <div class="search-input-wrap">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" class="search-input" id="citySearchInput"
+          placeholder="Search any city, solar farm, or coordinates (e.g. Dubai, Rajasthan, Mojave, Tokyo)..." />
+      </div>
+      <div class="presets-list" id="presetsContainer">
+        <button class="preset-chip active" data-lat="28.6139" data-lon="77.2090" data-name="Current Location">📍 Current
+          Location</button>
+        <button class="preset-chip" data-lat="27.5385" data-lon="71.9174" data-name="Bhadla Solar Park, India">☀️ Bhadla
+          Solar Park (India)</button>
+        <button class="preset-chip" data-lat="25.2048" data-lon="55.2708" data-name="Dubai Solar Park, UAE">☀️ Dubai MBR
+          (UAE)</button>
+        <button class="preset-chip" data-lat="35.0110" data-lon="-115.4734" data-name="Mojave Desert Solar, CA">☀️
+          Mojave Desert (USA)</button>
+        <button class="preset-chip" data-lat="48.1351" data-lon="11.5820" data-name="Munich, Germany">⛅ Munich
+          (Germany)</button>
+        <button class="preset-chip" data-lat="-33.8688" data-lon="151.2093" data-name="Sydney, Australia">☀️ Sydney
+          (Australia)</button>
+        <button class="preset-chip" data-lat="35.6762" data-lon="139.6503" data-name="Tokyo, Japan">⛅ Tokyo
+          (Japan)</button>
+      </div>
+    </section>
+
+    <!-- AI WEATHER IMAGE CLASSIFIER -->
+    <section class="weather-ai-panel">
+      <div class="weather-upload-zone" id="weatherUploadZone">
+        <div class="weather-upload-title">Upload a sky image for AI weather classification</div>
+        <div class="weather-upload-copy">The trained HOG + SVM model identifies the visible weather pattern and updates the solar forecast, irradiance, and microgrid dispatch.</div>
+        <div class="weather-upload-actions">
+          <button class="weather-upload-button" id="weatherUploadButton" type="button">Choose image</button>
+          <input id="weatherImageInput" type="file" accept="image/*" hidden>
+          <span class="weather-file-name" id="weatherFileName">No image selected</span>
+        </div>
+      </div>
+      <div class="weather-ai-result" aria-live="polite">
+        <img class="weather-ai-preview" id="weatherAiPreview" alt="Uploaded weather image preview">
+        <div class="weather-ai-result-copy">
+          <div class="weather-ai-label">Image model result</div>
+          <div class="weather-ai-class" id="weatherAiClass">Waiting for image</div>
+          <div class="weather-ai-meta" id="weatherAiMeta">Upload a sky image to replace live weather inputs.</div>
+        </div>
+        <div class="weather-solar-estimate">
+          <div class="weather-solar-estimate-label">Solar generation from uploaded image</div>
+          <div class="weather-solar-estimate-values">
+            <span class="weather-solar-current" id="weatherSolarCurrent">-- kW now</span>
+            <span class="weather-solar-day" id="weatherSolarDay">-- kWh estimated today</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXECUTIVE KPI METRIC GRID -->
+    <section class="kpi-grid">
+      <!-- Card 1: Solar Generation -->
+      <div class="kpi-card" style="--card-accent: var(--solar-gold);">
+        <div class="kpi-header">
+          <span class="kpi-title">Solar Generation</span>
+          <div class="kpi-icon-wrap">☀️</div>
+        </div>
+        <div class="kpi-value-row">
+          <span class="kpi-value" id="kpiSolarVal">--</span>
+          <span class="kpi-unit">kW</span>
+        </div>
+        <div class="kpi-subtext" id="kpiSolarSub">Array Capacity: 10.0 kWp</div>
+      </div>
+
+      <!-- Card 2: Community Load -->
+      <div class="kpi-card" style="--card-accent: var(--cyan-accent);">
+        <div class="kpi-header">
+          <span class="kpi-title">Microgrid Load</span>
+          <div class="kpi-icon-wrap">⚡</div>
+        </div>
+        <div class="kpi-value-row">
+          <span class="kpi-value" id="kpiLoadVal">--</span>
+          <span class="kpi-unit">kW</span>
+        </div>
+        <div class="kpi-subtext" id="kpiLoadSub">Residential & Commercial Demand</div>
+      </div>
+
+      <!-- Card 3: Battery Storage (BESS) -->
+      <div class="kpi-card" style="--card-accent: var(--emerald-battery);">
+        <div class="kpi-header">
+          <span class="kpi-title">Battery SoC</span>
+          <div class="kpi-icon-wrap">🔋</div>
+        </div>
+        <div class="kpi-value-row">
+          <span class="kpi-value" id="kpiSocVal">--</span>
+          <span class="kpi-unit">%</span>
+        </div>
+        <div class="kpi-subtext" id="kpiSocSub">13.5 kWh LFP Storage Reserve</div>
+      </div>
+
+      <!-- Card 4: Grid Import / Export -->
+      <div class="kpi-card" style="--card-accent: var(--coral-grid);">
+        <div class="kpi-header">
+          <span class="kpi-title">Grid Dispatch</span>
+          <div class="kpi-icon-wrap">🏢</div>
+        </div>
+        <div class="kpi-value-row">
+          <span class="kpi-value" id="kpiGridVal">0.00</span>
+          <span class="kpi-unit">kW</span>
+        </div>
+        <div class="kpi-subtext" id="kpiGridSub">Zero Carbon Solar First</div>
+      </div>
+
+      <!-- Card 5: Self-Sufficiency & Savings -->
+      <div class="kpi-card" style="--card-accent: var(--violet-ai);">
+        <div class="kpi-header">
+          <span class="kpi-title">Self-Sufficiency</span>
+          <div class="kpi-icon-wrap">🌱</div>
+        </div>
+        <div class="kpi-value-row">
+          <span class="kpi-value" id="kpiSufficiencyVal">100</span>
+          <span class="kpi-unit">%</span>
+        </div>
+        <div class="kpi-subtext" id="kpiCarbonVal">Avoided: 14.8 kg CO₂ today</div>
+      </div>
+    </section>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="tabs-nav">
+      <button class="tab-btn active" data-tab="overview">Overview & Live Dispatch</button>
+      <button class="tab-btn" data-tab="solar-forecast">Solar Irradiance & 24h Forecast</button>
+      <button class="tab-btn" data-tab="bess-analytics">BESS Storage & Degradation</button>
+      <button class="tab-btn" data-tab="ai-diagnostics">AI Model & Metrics</button>
+    </nav>
+
+    <!-- TAB 1: OVERVIEW & REAL-TIME DISPATCH -->
+    <main class="tab-content active" id="tab-overview">
+      <div class="main-grid">
+
+        <!-- Left Column: Sky Sun Arc & Energy Flow -->
+        <div class="telemetry-col">
+          <!-- Sky Sun Arc Scrubber -->
+          <div class="sky-hero-panel">
+            <div class="sky-svg-container">
+              <svg id="skyCanvas" viewBox="0 0 1000 280" preserveAspectRatio="none"></svg>
+            </div>
+            <div class="sky-overlay-stats">
+              <div class="sky-time-badge">
+                <span class="sky-time-text" id="heroTimeDisplay">12:00</span>
+                <span style="font-size: 11px; color: var(--text-sub);" id="heroSunElevation">Sun Elevation: --°</span>
+              </div>
+              <div class="sky-irradiance-badge">
+                <span style="font-size: 11px; text-transform: uppercase; color: var(--text-sub); display: block;">Global
+                  Irradiance (GHI)</span>
+                <span class="sky-irradiance-val" id="heroGhiDisplay">-- W/m²</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Energy Flow Nodes & 3D Isometric Eco-Home Blueprint (Pinterest/AJPOWER Style) -->
+          <div class="flow-panel">
+            <div class="flow-title-row">
+              <div>
+                <h3 style="font-family: var(--font-display); font-size: 17px; color: #fff;">Smart Eco-Home & 
+                  Battery Energy Storage System (BESS)</h3>
+                <div style="font-size: 12px; color: var(--text-sub); margin-top: 2px;">Architectural Cutaway • Active
+                  Photons • Bi-directional Power Conduits • Live Loads</div>
+              </div>
+              <div class="override-badge" id="flowDecisionBadge">⚡ DIRECT SOLAR SUPPLY</div>
+            </div>
+
+            <!-- Interactive 3D Isometric Villa & Circuit SVG Canvas -->
+            <div
+              style="background: radial-gradient(circle at 50% 50%, #0d1527 0%, #060a14 100%); border: 1px solid var(--panel-border-glow); border-radius: var(--radius-lg); padding: 18px; position: relative; margin-bottom: 16px; box-shadow: inset 0 0 40px rgba(0,0,0,0.6); overflow: hidden;">
+
+              <svg id="isometricHomeSvg" viewBox="0 0 920 380" style="width: 100%; height: auto; display: block;">
+                <defs>
+                  <!-- Glow Filters -->
+                  <filter id="glowGoldStrong" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="4" result="b1" />
+                    <feGaussianBlur stdDeviation="8" result="b2" />
+                    <feMerge>
+                      <feMergeNode in="b2" />
+                      <feMergeNode in="b1" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                  <filter id="glowEmeraldStrong" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="4" result="b1" />
+                    <feGaussianBlur stdDeviation="7" result="b2" />
+                    <feMerge>
+                      <feMergeNode in="b2" />
+                      <feMergeNode in="b1" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                  <filter id="glowCyanStrong" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="4" result="b1" />
+                    <feMerge>
+                      <feMergeNode in="b1" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+
+                  <!-- Solar Roof Shimmer Gradient -->
+                  <linearGradient id="solarShimmer" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#0284c7" stop-opacity="0.8" />
+                    <stop offset="50%" stop-color="#38bdf8" stop-opacity="1">
+                      <animate attributeName="stop-color" values="#0284c7;#38bdf8;#ffb703;#0284c7" dur="4s"
+                        repeatCount="indefinite" />
+                    </stop>
+                    <stop offset="100%" stop-color="#0f172a" stop-opacity="0.9" />
+                  </linearGradient>
+
+                  <linearGradient id="batteryGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" stop-color="#059669" />
+                    <stop offset="100%" stop-color="#10b981" />
+                  </linearGradient>
+                </defs>
+
+                <!-- Sky Sun & Photon Rays -->
+                <g id="sunSourceGroup" transform="translate(110, 40)">
+                  <circle cx="0" cy="0" r="28" fill="url(#solarShimmer)" opacity="0.2" />
+                  <circle cx="0" cy="0" r="18" fill="#ffb703" filter="url(#glowGoldStrong)" />
+                  <circle cx="0" cy="0" r="10" fill="#ffffff" />
+                  <!-- Sun Rays falling onto Roof -->
+                  <line x1="15" y1="15" x2="140" y2="75" stroke="#ffb703" stroke-width="1.5" stroke-dasharray="4,4"
+                    opacity="0.6">
+                    <animate attributeName="stroke-dashoffset" from="0" to="-20" dur="1s" repeatCount="indefinite" />
+                  </line>
+                  <line x1="25" y1="5" x2="220" y2="70" stroke="#ffb703" stroke-width="1.5" stroke-dasharray="4,4"
+                    opacity="0.6">
+                    <animate attributeName="stroke-dashoffset" from="0" to="-20" dur="1s" repeatCount="indefinite" />
+                  </line>
+                  <line x1="5" y1="20" x2="80" y2="90" stroke="#ffb703" stroke-width="1.5" stroke-dasharray="4,4"
+                    opacity="0.6">
+                    <animate attributeName="stroke-dashoffset" from="0" to="-20" dur="1s" repeatCount="indefinite" />
+                  </line>
+                </g>
+
+                <!-- Modern Isometric House Structure -->
+                <!-- House Base / Shadow -->
+                <polygon points="120,330 460,370 800,310 460,270" fill="rgba(0,0,0,0.5)" />
+
+                <!-- Ground Floor Wall -->
+                <polygon points="150,210 460,250 460,345 150,305" fill="#0d1527" stroke="rgba(56,189,248,0.2)"
+                  stroke-width="1.5" />
+                <polygon points="460,250 760,200 760,295 460,345" fill="#090f1d" stroke="rgba(56,189,248,0.15)"
+                  stroke-width="1.5" />
+
+                <!-- Rooftop Solar PV Tiles (Isometric Pitched Roof) -->
+                <polygon id="solarRoofPolygon" points="130,205 460,245 460,140 190,110" fill="url(#solarShimmer)"
+                  stroke="#ffb703" stroke-width="2" filter="url(#glowGoldStrong)" />
+                <polygon points="460,245 780,195 720,105 460,140" fill="#0c1a33" stroke="rgba(56,189,248,0.4)"
+                  stroke-width="1.5" />
+
+                <!-- Solar Panel Grid Lines -->
+                <line x1="210" y1="135" x2="240" y2="220" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+                <line x1="290" y1="145" x2="320" y2="230" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+                <line x1="370" y1="155" x2="400" y2="240" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+                <line x1="160" y1="160" x2="460" y2="195" stroke="rgba(255,255,255,0.3)" stroke-width="1" />
+                <line x1="145" y1="185" x2="460" y2="220" stroke="rgba(255,255,255,0.3)" stroke-width="1" />
+
+                <!-- Central Inverter Unit (Wall Mounted Inside Utility Room) -->
+                <g transform="translate(425, 170)">
+                  <rect x="0" y="0" width="70" height="65" rx="6" fill="#0b172a" stroke="var(--cyan-accent)"
+                    stroke-width="2" filter="url(#glowCyanStrong)" />
+                  <text x="35" y="18" fill="#00f2fe" font-family="Outfit" font-size="9" font-weight="800"
+                    text-anchor="middle">HYBRID MPPT</text>
+                  <circle cx="35" cy="38" r="14" fill="#030712" stroke="#38bdf8" stroke-width="1.5" />
+                  <!-- Sine wave icon -->
+                  <path d="M 26 38 Q 30 31 35 38 T 44 38" fill="none" stroke="#00f2fe" stroke-width="2">
+                    <animate attributeName="stroke-dasharray" values="1,10;5,5;1,10" dur="2s"
+                      repeatCount="indefinite" />
+                  </path>
+                  <text x="35" y="60" fill="#94a3b8" font-family="JetBrains Mono" font-size="8"
+                    text-anchor="middle">98.4% Eff</text>
+                </g>
+
+                <!-- Smart Battery Rack (AJPOWER Style Stacked Modules) -->
+                <g transform="translate(170, 220)">
+                  <rect x="0" y="0" width="85" height="100" rx="8" fill="#06121e" stroke="var(--emerald-battery)"
+                    stroke-width="2" filter="url(#glowEmeraldStrong)" />
+                  <text x="42" y="16" fill="#10b981" font-family="Outfit" font-size="9.5" font-weight="800"
+                    text-anchor="middle"> BESS</text>
+                  <!-- 4 Stacked Battery Cells -->
+                  <rect x="10" y="24" width="65" height="13" rx="3" fill="#0f291e" stroke="#10b981" stroke-width="1" />
+                  <rect id="bessCell4" x="12" y="26" width="61" height="9" rx="2" fill="#10b981">
+                    <animate attributeName="opacity" values="0.7;1;0.7" dur="1.5s" repeatCount="indefinite" />
+                  </rect>
+
+                  <rect x="10" y="41" width="65" height="13" rx="3" fill="#0f291e" stroke="#10b981" stroke-width="1" />
+                  <rect id="bessCell3" x="12" y="43" width="61" height="9" rx="2" fill="#10b981" />
+
+                  <rect x="10" y="58" width="65" height="13" rx="3" fill="#0f291e" stroke="#10b981" stroke-width="1" />
+                  <rect id="bessCell2" x="12" y="60" width="61" height="9" rx="2" fill="#10b981" />
+
+                  <rect x="10" y="75" width="65" height="13" rx="3" fill="#0f291e" stroke="#10b981" stroke-width="1" />
+                  <rect id="bessCell1" x="12" y="77" width="61" height="9" rx="2" fill="#10b981" />
+
+                  <text x="42" y="96" fill="#ffffff" font-family="JetBrains Mono" font-size="9" font-weight="700"
+                    text-anchor="middle" id="isoBessSoc">13.5 kWh (65%)</text>
+                </g>
+
+                <!-- Room 1: Garage with Electric Vehicle (EV) Charging -->
+                <g transform="translate(275, 255)">
+                  <!-- Garage Wall Frame -->
+                  <rect x="0" y="0" width="130" height="80" rx="6" fill="rgba(15,23,42,0.6)"
+                    stroke="rgba(255,255,255,0.1)" />
+                  <text x="10" y="16" fill="#94a3b8" font-family="Outfit" font-size="9" font-weight="700">🚗 SMART EV
+                    CHARGER</text>
+                  <!-- EV Car Silhouette -->
+                  <path d="M 20 62 L 35 46 L 75 46 L 95 62 Z" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
+                  <circle cx="35" cy="65" r="7" fill="#0f172a" stroke="#94a3b8" stroke-width="1.5" />
+                  <circle cx="80" cy="65" r="7" fill="#0f172a" stroke="#94a3b8" stroke-width="1.5" />
+                  <!-- Charging Cable & Plug -->
+                  <path d="M 105 40 Q 115 55 95 56" fill="none" stroke="#00f2fe" stroke-width="2"
+                    stroke-dasharray="3,3">
+                    <animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite" />
+                  </path>
+                  <text x="10" y="32" fill="#38bdf8" font-family="JetBrains Mono" font-size="10" font-weight="700"
+                    id="isoEvKw">3.2 kW (EV)</text>
+                </g>
+
+                <!-- Room 2: Living Room & HVAC Heat Pump Cooling -->
+                <g transform="translate(530, 220)">
+                  <rect x="0" y="0" width="115" height="110" rx="6" fill="rgba(15,23,42,0.6)"
+                    stroke="rgba(255,255,255,0.1)" />
+                  <text x="10" y="16" fill="#94a3b8" font-family="Outfit" font-size="9" font-weight="700">❄️ HVAC HEAT
+                    PUMP</text>
+                  <!-- HVAC Unit with Spinning Fan -->
+                  <rect x="15" y="28" width="85" height="40" rx="4" fill="#0b1322" stroke="#38bdf8" stroke-width="1" />
+                  <g transform="translate(40, 48)">
+                    <circle cx="0" cy="0" r="14" fill="#030712" stroke="rgba(56,189,248,0.4)" />
+                    <line x1="-12" y1="0" x2="12" y2="0" stroke="#00f2fe" stroke-width="2">
+                      <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="0.6s"
+                        repeatCount="indefinite" />
+                    </line>
+                    <line x1="0" y1="-12" x2="0" y2="12" stroke="#00f2fe" stroke-width="2">
+                      <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="0.6s"
+                        repeatCount="indefinite" />
+                    </line>
+                  </g>
+                  <text x="60" y="52" fill="#fff" font-family="JetBrains Mono" font-size="10" font-weight="700"
+                    id="isoHvacKw">1.8 kW</text>
+                  <!-- Smart Kitchen / Lighting below -->
+                  <text x="10" y="85" fill="#94a3b8" font-family="Outfit" font-size="8.5">🍳 Induction & 💡 IoT
+                    Core</text>
+                  <text x="10" y="100" fill="#cbd5e1" font-family="JetBrains Mono" font-size="9" font-weight="600"
+                    id="isoHomeOtherKw">1.2 kW</text>
+                </g>
+
+                <!-- External Utility Power Grid Pylon -->
+                <g transform="translate(800, 110)">
+                  <!-- High Voltage Transmission Tower -->
+                  <line x1="40" y1="20" x2="15" y2="170" stroke="#64748b" stroke-width="2" />
+                  <line x1="40" y1="20" x2="65" y2="170" stroke="#64748b" stroke-width="2" />
+                  <line x1="20" y1="60" x2="60" y2="60" stroke="#64748b" stroke-width="1.5" />
+                  <line x1="10" y1="100" x2="70" y2="100" stroke="#64748b" stroke-width="2" />
+                  <line x1="15" y1="135" x2="65" y2="135" stroke="#64748b" stroke-width="1.5" />
+                  <circle cx="40" cy="18" r="4" fill="#ff4d4d" filter="url(#glowGoldStrong)">
+                    <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" repeatCount="indefinite" />
+                  </circle>
+                  <!-- Smart Meter Box -->
+                  <rect x="15" y="175" width="50" height="42" rx="4" fill="#1c0d0f" stroke="var(--coral-grid)"
+                    stroke-width="1.5" />
+                  <text x="40" y="190" fill="#ff4d4d" font-family="Outfit" font-size="8" font-weight="800"
+                    text-anchor="middle">GRID</text>
+                  <text x="40" y="208" fill="#f87171" font-family="JetBrains Mono" font-size="9" font-weight="700"
+                    text-anchor="middle" id="isoGridKw">0.00 kW</text>
+                </g>
+
+                <!-- Active Animated Glowing Conduits & Flow Paths -->
+                <!-- 1. Roof to Inverter Conduit -->
+                <path id="pathRoofToInv" d="M 330 195 L 425 195" fill="none" stroke="rgba(255,183,3,0.4)"
+                  stroke-width="4" />
+                <!-- 2. Inverter to Battery Conduit -->
+                <path id="pathInvToBat" d="M 425 215 L 340 215 L 340 240 L 255 240" fill="none"
+                  stroke="rgba(16,185,129,0.4)" stroke-width="4" />
+                <!-- 3. Inverter to EV & Home Conduits -->
+                <path id="pathInvToEV" d="M 460 235 L 460 270 L 405 270" fill="none" stroke="rgba(0,242,254,0.4)"
+                  stroke-width="4" />
+                <path id="pathInvToHVAC" d="M 495 210 L 530 240" fill="none" stroke="rgba(0,242,254,0.4)"
+                  stroke-width="4" />
+                <!-- 4. Grid to Inverter Conduit -->
+                <path id="pathGridToInv" d="M 800 195 L 495 195" fill="none" stroke="rgba(255,77,77,0.3)"
+                  stroke-width="3" stroke-dasharray="6,4" />
+
+                <!-- Flowing Laser Photon Particles -->
+                <!-- Solar Photons (Roof -> Inverter) -->
+                <circle id="streamSolar1" r="5" fill="#ffb703" filter="url(#glowGoldStrong)">
+                  <animateMotion dur="1.2s" repeatCount="indefinite" path="M 330 195 L 425 195" />
+                </circle>
+                <circle id="streamSolar2" r="3" fill="#ffffff">
+                  <animateMotion dur="1.2s" begin="0.6s" repeatCount="indefinite" path="M 330 195 L 425 195" />
+                </circle>
+
+                <!-- Battery Energy Stream (Bidirectional) -->
+                <circle id="streamBat" r="5" fill="#10b981" filter="url(#glowEmeraldStrong)">
+                  <animateMotion id="streamBatAnim" dur="1.5s" repeatCount="indefinite"
+                    path="M 425 215 L 340 215 L 340 240 L 255 240" />
+                </circle>
+
+                <!-- Home Consumption Energy Stream (Inverter -> EV & HVAC) -->
+                <circle id="streamHome1" r="4" fill="#00f2fe" filter="url(#glowCyanStrong)">
+                  <animateMotion dur="1.4s" repeatCount="indefinite" path="M 460 235 L 460 270 L 405 270" />
+                </circle>
+                <circle id="streamHome2" r="4" fill="#00f2fe" filter="url(#glowCyanStrong)">
+                  <animateMotion dur="1.6s" repeatCount="indefinite" path="M 495 210 L 530 240" />
+                </circle>
+
+                <!-- Utility Grid Flow -->
+                <circle id="streamGrid" r="5" fill="#ff4d4d" opacity="0">
+                  <animateMotion id="streamGridAnim" dur="2s" repeatCount="indefinite" path="M 800 195 L 495 195" />
+                </circle>
+              </svg>
+            </div>
+
+            <!-- Interactive Appliance Smart Load Toggles (What-If Consumption) -->
+            <div
+              style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--panel-border); border-radius: var(--radius-md); padding: 12px 16px; margin-bottom: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span
+                  style="font-family: var(--font-display); font-size: 13px; font-weight: 700; color: #fff;">Interactive
+                  Eco-Home Appliance Toggles</span>
+                <span style="font-size: 11px; color: var(--text-muted);">Toggle appliances to watch microgrid battery &
+                  grid rebalance live!</span>
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button class="preset-chip active" id="toggleEvBtn" data-appliance="ev" data-kw="3.2">🚗 EV Wallbox (3.2
+                  kW) <span style="color: var(--emerald-battery);">[ACTIVE]</span></button>
+                <button class="preset-chip active" id="toggleHvacBtn" data-appliance="hvac" data-kw="1.8">❄️ Heat Pump /
+                  HVAC (1.8 kW) <span style="color: var(--emerald-battery);">[ACTIVE]</span></button>
+                <button class="preset-chip active" id="toggleKitchenBtn" data-appliance="kitchen" data-kw="0.8">🍳
+                  Induction Kitchen (0.8 kW) <span style="color: var(--emerald-battery);">[ACTIVE]</span></button>
+                <button class="preset-chip active" id="toggleIotBtn" data-appliance="iot" data-kw="0.4">💡 LED & Smart
+                  Core (0.4 kW) <span style="color: var(--emerald-battery);">[ACTIVE]</span></button>
+              </div>
+            </div>
+
+            <!-- Quick Telemetry Matrix Row -->
+            <div class="flow-matrix">
+              <div class="node-box active"
+                style="--node-color: var(--solar-gold); --node-glow: var(--solar-gold-glow);">
+                <div class="node-icon">☀️</div>
+                <div class="node-label">Solar PV Array</div>
+                <div class="node-power" id="flowSolarVal">-- kW</div>
+              </div>
+              <div class="node-box active"
+                style="--node-color: var(--emerald-battery); --node-glow: var(--emerald-glow);">
+                <div class="node-icon">🔋</div>
+                <div class="node-label">Battery</div>
+                <div class="node-power" id="flowBatteryVal">-- kW</div>
+              </div>
+              <div class="node-box active" style="--node-color: var(--cyan-accent); --node-glow: var(--cyan-glow);">
+                <div class="node-icon">🏠</div>
+                <div class="node-label">Eco-Home Load</div>
+                <div class="node-power" id="flowLoadVal">-- kW</div>
+              </div>
+              <div class="node-box" id="gridNodeBox"
+                style="--node-color: var(--coral-grid); --node-glow: var(--coral-glow);">
+                <div class="node-icon">🏢</div>
+                <div class="node-label">Grid Substation</div>
+                <div class="node-power" id="flowGridVal">0.00 kW</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 24-Hour Forecast Curve Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3 style="font-family: var(--font-display); font-size: 16px; color: #fff;">24-Hour Solar vs Microgrid
+                Load Trajectory</h3>
+              <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-sub);">AI-Gradient Boosted
+                Horizon</span>
+            </div>
+            <div class="chart-canvas-wrap">
+              <canvas id="overviewChart"></canvas>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Meteorological Telemetry & Manual Override Controls -->
+        <div class="controls-sidebar">
+
+          <!-- Live Satellite Telemetry Card -->
+          <div class="control-panel">
+            <div class="panel-heading">
+              <span id="weatherPanelTitle">Satellite Meteorological Data</span>
+              <span class="override-badge" id="weatherSourceBadge">LIVE</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+              <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
+                <span style="font-size: 11px; color: var(--text-muted); display: block;">Direct Normal (DNI)</span>
+                <span style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: #fff;"
+                  id="telemetryDni">-- W/m²</span>
+              </div>
+              <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
+                <span style="font-size: 11px; color: var(--text-muted); display: block;">Diffuse Irradiance (DHI)</span>
+                <span style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: #fff;"
+                  id="telemetryDhi">-- W/m²</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Sliders / Manual Override -->
+          <div class="control-panel">
+            <div class="panel-heading">
+              <span>Environmental Parameters</span>
+              <span class="override-badge" id="modeStateBadge">LIVE SYNC</span>
+            </div>
+            <div class="slider-group">
+              <div class="slider-item">
+                <div class="slider-top-label">
+                  <span>Time of Day (Sun Arc)</span>
+                  <span class="slider-top-val" id="valHour">12:00</span>
+                </div>
+                <input type="range" class="custom-range" id="sliderHour" min="0" max="23" step="0.5" value="12">
+              </div>
+              <div class="slider-item">
+                <div class="slider-top-label">
+                  <span>Cloud Cover Attenuation</span>
+                  <span class="slider-top-val" id="valCloud">25%</span>
+                </div>
+                <input type="range" class="custom-range" id="sliderCloud" min="0" max="100" value="25">
+              </div>
+              <div class="slider-item">
+                <div class="slider-top-label">
+                  <span>Ambient Temperature</span>
+                  <span class="slider-top-val" id="valTemp">28°C</span>
+                </div>
+                <input type="range" class="custom-range" id="sliderTemp" min="-10" max="50" value="28">
+              </div>
+              <div class="slider-item">
+                <div class="slider-top-label">
+                  <span>Relative Humidity</span>
+                  <span class="slider-top-val" id="valHumidity">55%</span>
+                </div>
+                <input type="range" class="custom-range" id="sliderHumidity" min="10" max="100" value="55">
+              </div>
+              <div class="slider-item">
+                <div class="slider-top-label">
+                  <span>Wind Speed</span>
+                  <span class="slider-top-val" id="valWind">14 km/h</span>
+                </div>
+                <input type="range" class="custom-range" id="sliderWind" min="0" max="60" value="14">
+              </div>
+            </div>
+
+            <button class="resync-btn" id="resyncLiveBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+              </svg>
+              Re-sync to Live Satellite Weather
+            </button>
+          </div>
+
+          <!-- BESS Status Quick Card -->
+          <div class="battery-viz-card">
+            <div class="panel-heading">
+              <span>BESS Battery Energy Storage</span>
+              <span class="override-badge"
+                style="color: var(--emerald-battery); border-color: var(--emerald-battery);">HEALTH 99.4%</span>
+            </div>
+            <div class="bess-rack">
+              <div class="bess-cell-outer">
+                <div class="bess-liquid" id="bessFluid"></div>
+              </div>
+              <div class="bess-info">
+                <div class="bess-soc-pct" id="bessSocDisplay">65%</div>
+                <div style="font-size: 12px; color: var(--text-sub);">Storage: 8.78 kWh / 13.5 kWh</div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Min Reserve Threshold: 10%
+                  (1.35 kWh)</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+
+    <!-- TAB 2: SOLAR IRRADIANCE & 24H FORECAST -->
+    <main class="tab-content" id="tab-solar-forecast">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 style="font-family: var(--font-display); font-size: 17px; color: #fff;">Detailed Solar Spectral &
+            Irradiance Analysis</h3>
+          <span style="font-family: var(--font-mono); font-size: 12px; color: var(--solar-gold);">GHI & DNI Satellite
+            Horizon</span>
+        </div>
+        <div class="chart-canvas-wrap" style="height: 380px;">
+          <canvas id="detailedSolarChart"></canvas>
+        </div>
+      </div>
+    </main>
+
+    <!-- TAB 3: BESS STORAGE ANALYTICS -->
+    <main class="tab-content" id="tab-bess-analytics">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 style="font-family: var(--font-display); font-size: 17px; color: #fff;">Battery Charge / Discharge Cycle &
+            SoC Trajectory</h3>
+          <span style="font-family: var(--font-mono); font-size: 12px; color: var(--emerald-battery);">BESS LFP
+            Multi-Hour State</span>
+        </div>
+        <div class="chart-canvas-wrap" style="height: 380px;">
+          <canvas id="bessChart"></canvas>
+        </div>
+      </div>
+    </main>
+
+    <!-- TAB 4: AI MODEL DIAGNOSTICS -->
+    <main class="tab-content" id="tab-ai-diagnostics">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px;">
+        <div class="control-panel">
+          <div class="panel-heading">
+            <span>AI Model Accuracy Metrics</span>
+            <span class="override-badge">HistGBM / XGBoost</span>
+          </div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px;">
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); height: 36px;">
+              <td style="color: var(--text-sub);">Algorithm Architecture</td>
+              <td style="text-align: right; font-weight: 700; color: #fff;">Histogram Gradient Boosting</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); height: 36px;">
+              <td style="color: var(--text-sub);">Mean Absolute Error (MAE)</td>
+              <td
+                style="text-align: right; font-family: var(--font-mono); font-weight: 700; color: var(--cyan-accent);">
+                0.0355 kW</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); height: 36px;">
+              <td style="color: var(--text-sub);">Root Mean Squared Error (RMSE)</td>
+              <td
+                style="text-align: right; font-family: var(--font-mono); font-weight: 700; color: var(--cyan-accent);">
+                0.0461 kW</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); height: 36px;">
+              <td style="color: var(--text-sub);">Coefficient of Determination (R²)</td>
+              <td
+                style="text-align: right; font-family: var(--font-mono); font-weight: 700; color: var(--emerald-battery);">
+                0.9994 (99.94%)</td>
+            </tr>
+            <tr style="height: 36px;">
+              <td style="color: var(--text-sub);">Inference Latency</td>
+              <td style="text-align: right; font-family: var(--font-mono); font-weight: 700; color: var(--solar-gold);">
+                &lt; 1.2 ms</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="control-panel">
+          <div class="panel-heading">
+            <span>Feature Attribution & Importance</span>
+            <span class="override-badge">Permutation Scoring</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px; font-size: 12px;">
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span>Clear-Sky GHI & Solar Elevation</span>
+                <span style="font-family: var(--font-mono); color: var(--solar-gold);">54.2%</span>
+              </div>
+              <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+                <div style="width: 54.2%; height: 100%; background: var(--solar-gold);"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span>Cloud Cover Attenuation</span>
+                <span style="font-family: var(--font-mono); color: var(--cyan-accent);">24.8%</span>
+              </div>
+              <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+                <div style="width: 24.8%; height: 100%; background: var(--cyan-accent);"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span>Autoregressive Lag-24h & Roll-3h</span>
+                <span style="font-family: var(--font-mono); color: var(--emerald-battery);">12.5%</span>
+              </div>
+              <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+                <div style="width: 12.5%; height: 100%; background: var(--emerald-battery);"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span>Thermal & Humidity Derating</span>
+                <span style="font-family: var(--font-mono); color: var(--violet-ai);">8.5%</span>
+              </div>
+              <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+                <div style="width: 8.5%; height: 100%; background: var(--violet-ai);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- JAVASCRIPT APPLICATION CORE -->
+  <script>
+    "use strict";
+
+    /* ==========================================================================
+       EMS STATE & CONFIGURATION
+       ========================================================================== */
+    const state = {
+      lat: 28.6139,
+      lon: 77.2090,
+      cityName: "Detecting Location…",
+      isLiveAuto: true,
+      currentHour: 12,
+      weather: {
+        ghi: 750,
+        dni: 620,
+        dhi: 130,
+        temp: 28,
+        humidity: 50,
+        cloud: 20,
+        wind: 12,
+        isDay: 1,
+        ghiSource: "live"
+      },
+      battery: {
+        capacityKwh: 13.5,
+        socKwh: 8.78,
+        maxChargeKw: 5.0,
+        maxDischargeKw: 5.0,
+        minSocPct: 10.0
+      },
+      appliances: {
+        ev: true,      // 3.2 kW
+        hvac: true,    // 1.8 kW
+        kitchen: true, // 0.8 kW
+        iot: true      // 0.4 kW
+      },
+      forecast24h: []
+    };
+
+    let overviewChartInstance = null;
+    let detailedChartInstance = null;
+    let bessChartInstance = null;
+
+    /* ==========================================================================
+       PHYSICS & MICROGRID LOGIC
+       ========================================================================== */
+    function calculateSolarElevation(latDeg, dayOfYear, hourDecimal) {
+      const lat = latDeg * Math.PI / 180;
+      const decl = (23.45 * Math.sin((2 * Math.PI / 365) * (dayOfYear - 81))) * Math.PI / 180;
+      const hourAngle = (15 * (hourDecimal - 12)) * Math.PI / 180;
+      const sinElev = Math.sin(lat) * Math.sin(decl) + Math.cos(lat) * Math.cos(decl) * Math.cos(hourAngle);
+      return Math.asin(Math.max(-1, Math.min(1, sinElev))) * 180 / Math.PI;
+    }
+
+    function calculateClearSkyGHI(elevationDeg) {
+      if (elevationDeg <= 0) return 0;
+      const elevRad = elevationDeg * Math.PI / 180;
+      const airMass = 1 / Math.max(Math.sin(elevRad), 0.05);
+      return Math.max(1000 * Math.sin(elevRad) * Math.exp(-0.14 * airMass), 0);
+    }
+
+    function computeSolarPower(hour, cloudPct, tempC, humidityPct) {
+      const now = new Date();
+      const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+      const elev = calculateSolarElevation(state.lat, dayOfYear, hour);
+      if (elev <= 0) return 0;
+
+      const ghiClear = calculateClearSkyGHI(elev);
+      const cloudAtten = 1 - 0.75 * Math.pow(cloudPct / 100, 1.3);
+      const ghi = Math.max(ghiClear * cloudAtten, 0);
+      const tempDerate = 1 - Math.max(tempC - 25, 0) * 0.004;
+      const humidityDerate = 1 - Math.max(humidityPct - 80, 0) * 0.0015;
+
+      const rawKw = (ghi / 1000) * 10.0 * tempDerate * humidityDerate;
+      return Math.min(Math.max(rawKw, 0), 10.0);
+    }
+
+    function computeLoadDemand(hour) {
+      const baseProfile = Math.max(
+        3.2
+        + 2.0 * Math.exp(-Math.pow(hour - 8, 2) / 4)
+        + 3.2 * Math.exp(-Math.pow(hour - 19.5, 2) / 6)
+        + 0.6 * Math.exp(-Math.pow(hour - 13, 2) / 8),
+        0.4
+      );
+
+      let applianceLoad = 0;
+      if (state.appliances.ev) applianceLoad += 3.2;
+      if (state.appliances.hvac) applianceLoad += 1.8;
+      if (state.appliances.kitchen) applianceLoad += 0.8;
+      if (state.appliances.iot) applianceLoad += 0.4;
+
+      return Math.max(baseProfile * 0.25 + applianceLoad * 0.75, 0.4);
+    }
+
+    function runMicrogridDispatch(solarKw, loadKw) {
+      const netKw = solarKw - loadKw;
+      const minSocKwh = state.battery.capacityKwh * (state.battery.minSocPct / 100);
+      let action = "DIRECT SUPPLY";
+      let batteryFlow = 0;
+      let gridImport = 0;
+
+      if (netKw > 0.05) {
+        const chargeable = Math.min(netKw, state.battery.maxChargeKw);
+        const room = state.battery.capacityKwh - state.battery.socKwh;
+        const actualCharge = Math.min(chargeable, room);
+        state.battery.socKwh = Math.min(state.battery.capacityKwh, state.battery.socKwh + actualCharge);
+        batteryFlow = actualCharge;
+        action = actualCharge > 0.05 ? "CHARGING" : "DIRECT SUPPLY";
+      } else if (netKw < -0.05) {
+        const deficit = -netKw;
+        const available = Math.max(state.battery.socKwh - minSocKwh, 0);
+        const discharge = Math.max(Math.min(deficit, state.battery.maxDischargeKw, available), 0);
+        state.battery.socKwh = Math.max(minSocKwh, state.battery.socKwh - discharge);
+        batteryFlow = -discharge;
+        const remaining = deficit - discharge;
+        if (remaining > 0.05) {
+          gridImport = remaining;
+          action = discharge <= 0.05 ? "GRID IMPORT" : "BATTERY + GRID";
+        } else {
+          action = "DISCHARGING";
+        }
+      }
+
+      return { action, netKw, batteryFlow, gridImport, socPct: (100 * state.battery.socKwh / state.battery.capacityKwh) };
+    }
+
+    /* ==========================================================================
+       LIVE WEATHER & GEOLOCATION API CLIENT (With Direct Client Fallback)
+       ========================================================================== */
+    async function fetchLiveSatelliteWeather(lat, lon, cityName) {
+      state.lat = lat;
+      state.lon = lon;
+      if (cityName) state.cityName = cityName;
+
+      document.getElementById("currentCityName").textContent = state.cityName;
+      document.getElementById("currentCoords").textContent = `GPS: ${lat.toFixed(2)}° N, ${lon.toFixed(2)}° E`;
+
+      let weatherLoaded = false;
+
+      // 1. Try local Flask backend first
+      try {
+        const resp = await fetch(`/api/weather/live?lat=${lat}&lon=${lon}`, { signal: AbortSignal.timeout(3000) });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data.current) {
+            state.weather.ghi = data.current.ghi_wm2 || 750;
+            state.weather.dni = data.current.dni_wm2 || 600;
+            state.weather.dhi = data.current.dhi_wm2 || 150;
+            state.weather.temp = data.current.temperature_c || 28;
+            state.weather.humidity = data.current.humidity_pct || 50;
+            state.weather.cloud = data.current.cloud_cover_pct || 20;
+            state.weather.wind = data.current.wind_speed_kmh || 12;
+            state.weather.ghiSource = "live";
+            state.forecast24h = data.forecast_24h || [];
+            weatherLoaded = true;
+          }
+        }
+      } catch (backendErr) {
+        console.log("Local backend offline/busy, querying satellite API directly...", backendErr);
+      }
+
+      // 2. Direct Satellite Open-Meteo & NASA API fallback (Client-Side)
+      if (!weatherLoaded) {
+        try {
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,cloud_cover,wind_speed_10m,direct_radiation,diffuse_radiation,shortwave_radiation,is_day&forecast_days=1&timezone=auto`;
+          const resp = await fetch(url, { signal: AbortSignal.timeout(5000) });
+          if (resp.ok) {
+            const raw = await resp.json();
+            const cur = raw.current || {};
+            state.weather.ghi = cur.shortwave_radiation || 720;
+            state.weather.dni = cur.direct_radiation || 580;
+            state.weather.dhi = cur.diffuse_radiation || 140;
+            state.weather.temp = cur.temperature_2m || 28;
+            state.weather.humidity = cur.relative_humidity_2m || 50;
+            state.weather.cloud = cur.cloud_cover || 20;
+            state.weather.wind = cur.wind_speed_10m || 12;
+            state.weather.isDay = cur.is_day ?? 1;
+            state.weather.ghiSource = "live";
+            weatherLoaded = true;
+          }
+        } catch (apiErr) {
+          console.warn("Direct satellite API fallback also using mathematical physics:", apiErr);
+        }
+      }
+
+      // 3. Fallback physics dataset calculation
+      if (!state.forecast24h || state.forecast24h.length === 0) {
+        state.forecast24h = [];
+        for (let h = 0; h < 24; h++) {
+          const pred = computeSolarPower(h, state.weather.cloud, state.weather.temp, state.weather.humidity);
+          const load = computeLoadDemand(h);
+          state.forecast24h.push({
+            hour: h,
+            predicted_solar_kw: round(pred, 3),
+            load_demand_kw: round(load, 3),
+            ghi_wm2: round(pred * 100, 1),
+            temperature_c: state.weather.temp,
+            cloud_cover_pct: state.weather.cloud
+          });
+        }
+      }
+
+      // Update slider displays
+      if (state.isLiveAuto) {
+        const nowHour = new Date().getHours() + (new Date().getMinutes() / 60);
+        document.getElementById("sliderHour").value = round(nowHour, 1);
+        document.getElementById("sliderCloud").value = state.weather.cloud;
+        document.getElementById("sliderTemp").value = Math.round(state.weather.temp);
+        document.getElementById("sliderHumidity").value = Math.round(state.weather.humidity);
+        document.getElementById("sliderWind").value = Math.round(state.weather.wind);
+      }
+
+      updateDashboardUI();
+    }
+
+    function autoDetectUserLocation() {
+      document.getElementById("currentCityName").textContent = "Locating GPS…";
+
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            let city = `Detected (${lat.toFixed(1)}°, ${lon.toFixed(1)}°)`;
+            try {
+              const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`, { signal: AbortSignal.timeout(3000) });
+              const j = await r.json();
+              city = j.address.city || j.address.town || j.address.county || j.address.state || city;
+            } catch (e) { }
+            fetchLiveSatelliteWeather(lat, lon, city);
+          },
+          async (err) => {
+            console.log("Browser GPS blocked, trying IP Geolocation...");
+            // IP Geolocation fallback
+            try {
+              const ipResp = await fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(4000) });
+              if (ipResp.ok) {
+                const ipData = await ipResp.json();
+                if (ipData.latitude && ipData.longitude) {
+                  fetchLiveSatelliteWeather(ipData.latitude, ipData.longitude, `${ipData.city || 'Your Area'}, ${ipData.country_name || ''}`);
+                  return;
+                }
+              }
+            } catch (ipErr) { }
+            // Ultimate fallback
+            fetchLiveSatelliteWeather(28.6139, 77.2090, "New Delhi (Regional Solar Hub)");
+          },
+          { timeout: 5000, enableHighAccuracy: true }
+        );
+      } else {
+        fetchLiveSatelliteWeather(28.6139, 77.2090, "New Delhi (Regional Solar Hub)");
+      }
+    }
+
+    /* ==========================================================================
+       UI RENDERING & VISUALIZATIONS
+       ========================================================================== */
+    function round(v, n = 2) { return Number(v.toFixed(n)); }
+
+    function updateImageSolarEstimate() {
+      const currentElement = document.getElementById("weatherSolarCurrent");
+      const dayElement = document.getElementById("weatherSolarDay");
+      if (!currentElement || !dayElement) return;
+
+      if (state.weather.ghiSource !== "image") {
+        currentElement.textContent = "-- kW now";
+        dayElement.textContent = "-- kWh estimated today";
+        return;
+      }
+
+      const hour = parseFloat(document.getElementById("sliderHour").value);
+      const cloud = parseFloat(document.getElementById("sliderCloud").value);
+      const temp = parseFloat(document.getElementById("sliderTemp").value);
+      const humidity = parseFloat(document.getElementById("sliderHumidity").value);
+      const currentKw = computeSolarPower(hour, cloud, temp, humidity);
+      const estimatedDayKwh = Array.from({ length: 24 }, (_, index) =>
+        computeSolarPower(index, cloud, temp, humidity)
+      ).reduce((total, value) => total + value, 0);
+
+      currentElement.textContent = `${round(currentKw, 2)} kW now`;
+      dayElement.textContent = `${round(estimatedDayKwh, 2)} kWh estimated today`;
+    }
+
+    function updateDashboardUI() {
+      const h = parseFloat(document.getElementById("sliderHour").value);
+      const cloud = parseFloat(document.getElementById("sliderCloud").value);
+      const temp = parseFloat(document.getElementById("sliderTemp").value);
+      const hum = parseFloat(document.getElementById("sliderHumidity").value);
+      const wind = parseFloat(document.getElementById("sliderWind").value);
+
+      const hourInt = Math.floor(h);
+      const minInt = Math.round((h % 1) * 60);
+      document.getElementById("valHour").textContent = `${hourInt.toString().padStart(2, '0')}:${minInt.toString().padStart(2, '0')}`;
+      document.getElementById("valCloud").textContent = `${cloud}%`;
+      document.getElementById("valTemp").textContent = `${temp}°C`;
+      document.getElementById("valHumidity").textContent = `${hum}%`;
+      document.getElementById("valWind").textContent = `${wind} km/h`;
+
+      const solarKw = computeSolarPower(h, cloud, temp, hum);
+      const loadKw = computeLoadDemand(h);
+      const dispatch = runMicrogridDispatch(solarKw, loadKw);
+
+      // Update KPIs
+      document.getElementById("kpiSolarVal").textContent = round(solarKw, 2);
+      document.getElementById("kpiLoadVal").textContent = round(loadKw, 2);
+      document.getElementById("kpiSocVal").textContent = Math.round(dispatch.socPct);
+      document.getElementById("kpiGridVal").textContent = round(dispatch.gridImport, 2);
+
+      const sufficiency = loadKw > 0 ? Math.min(100, Math.round(((solarKw + Math.max(0, -dispatch.batteryFlow)) / loadKw) * 100)) : 100;
+      document.getElementById("kpiSufficiencyVal").textContent = sufficiency;
+
+      // Flow Nodes & 3D Isometric Eco-Home Cutaway Updates
+      document.getElementById("flowSolarVal").textContent = `${round(solarKw, 2)} kW`;
+      document.getElementById("flowLoadVal").textContent = `${round(loadKw, 2)} kW`;
+      document.getElementById("flowBatteryVal").textContent = `${dispatch.batteryFlow > 0 ? '+' : ''}${round(dispatch.batteryFlow, 2)} kW`;
+      document.getElementById("flowGridVal").textContent = `${round(dispatch.gridImport, 2)} kW`;
+      document.getElementById("flowDecisionBadge").textContent = `⚡ ${dispatch.action}`;
+
+      // 3D Isometric Elements
+      const isoBessSoc = document.getElementById("isoBessSoc");
+      const isoEvKw = document.getElementById("isoEvKw");
+      const isoHvacKw = document.getElementById("isoHvacKw");
+      const isoHomeOtherKw = document.getElementById("isoHomeOtherKw");
+      const isoGridKw = document.getElementById("isoGridKw");
+
+      if (isoBessSoc) isoBessSoc.textContent = `13.5 kWh (${Math.round(dispatch.socPct)}%)`;
+      if (isoEvKw) isoEvKw.textContent = state.appliances.ev ? '3.2 kW (EV)' : '0.0 kW (Standby)';
+      if (isoHvacKw) isoHvacKw.textContent = state.appliances.hvac ? '1.8 kW' : '0.0 kW';
+      if (isoHomeOtherKw) {
+        let otherKw = (state.appliances.kitchen ? 0.8 : 0) + (state.appliances.iot ? 0.4 : 0);
+        isoHomeOtherKw.textContent = `${round(otherKw, 1)} kW`;
+      }
+      if (isoGridKw) isoGridKw.textContent = `${round(dispatch.gridImport, 2)} kW`;
+
+      //  Stacked Cell Indicators (4 Stacked Modules)
+      const c1 = document.getElementById("bessCell1");
+      const c2 = document.getElementById("bessCell2");
+      const c3 = document.getElementById("bessCell3");
+      const c4 = document.getElementById("bessCell4");
+      if (c1) c1.style.opacity = dispatch.socPct >= 10 ? '1' : '0.15';
+      if (c2) c2.style.opacity = dispatch.socPct >= 35 ? '1' : '0.15';
+      if (c3) c3.style.opacity = dispatch.socPct >= 60 ? '1' : '0.15';
+      if (c4) c4.style.opacity = dispatch.socPct >= 85 ? '1' : '0.15';
+
+      // 3D Laser Conduits & Flowing Particles
+      const sSolar1 = document.getElementById("streamSolar1");
+      const sSolar2 = document.getElementById("streamSolar2");
+      const sBat = document.getElementById("streamBat");
+      const sBatAnim = document.getElementById("streamBatAnim");
+      const sHome1 = document.getElementById("streamHome1");
+      const sHome2 = document.getElementById("streamHome2");
+      const sGrid = document.getElementById("streamGrid");
+
+      if (sSolar1 && sSolar2) {
+        const isSolarActive = solarKw > 0.1;
+        sSolar1.style.opacity = isSolarActive ? '1' : '0.1';
+        sSolar2.style.opacity = isSolarActive ? '1' : '0.1';
+      }
+
+      if (sBat && sBatAnim) {
+        if (dispatch.batteryFlow > 0.05) {
+          sBat.setAttribute("fill", "#10b981");
+          sBatAnim.setAttribute("path", "M 425 215 L 340 215 L 340 240 L 255 240");
+          sBat.style.opacity = '1';
+        } else if (dispatch.batteryFlow < -0.05) {
+          sBat.setAttribute("fill", "#ffb703");
+          sBatAnim.setAttribute("path", "M 255 240 L 340 240 L 340 215 L 425 215");
+          sBat.style.opacity = '1';
+        } else {
+          sBat.style.opacity = '0.2';
+        }
+      }
+
+      if (sHome1) sHome1.style.opacity = state.appliances.ev ? '1' : '0.1';
+      if (sHome2) sHome2.style.opacity = state.appliances.hvac ? '1' : '0.1';
+      if (sGrid) sGrid.style.opacity = dispatch.gridImport > 0.05 ? '1' : '0';
+
+      // Grid node style
+      const gridBox = document.getElementById("gridNodeBox");
+      if (dispatch.gridImport > 0.05) gridBox.classList.add("active");
+      else gridBox.classList.remove("active");
+
+      // Sky Arc View
+      const now = new Date();
+      const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+      const elev = calculateSolarElevation(state.lat, dayOfYear, h);
+      const ghiClear = calculateClearSkyGHI(elev);
+      const calculatedGhi = Math.round(ghiClear * (1 - 0.75 * Math.pow(cloud / 100, 1.3)));
+      const ghiLive = state.weather.ghiSource === "image" ? Math.round(state.weather.ghi) : calculatedGhi;
+
+      document.getElementById("heroTimeDisplay").textContent = document.getElementById("valHour").textContent;
+      document.getElementById("heroSunElevation").textContent = `Sun Elevation: ${Math.max(0, Math.round(elev))}°`;
+      document.getElementById("heroGhiDisplay").textContent = `${ghiLive} W/m²`;
+
+      const dni = state.weather.ghiSource === "image" ? state.weather.dni : ghiLive * 0.8;
+      const dhi = state.weather.ghiSource === "image" ? state.weather.dhi : ghiLive * 0.2;
+      document.getElementById("telemetryDni").textContent = `${Math.round(dni)} W/m²`;
+      document.getElementById("telemetryDhi").textContent = `${Math.round(dhi)} W/m²`;
+
+      // Battery Graphic
+      const fluid = document.getElementById("bessFluid");
+      if (fluid) {
+        fluid.style.height = `${Math.min(100, Math.max(10, dispatch.socPct))}%`;
+        document.getElementById("bessSocDisplay").textContent = `${Math.round(dispatch.socPct)}%`;
+        if (dispatch.batteryFlow < -0.1) fluid.className = "bess-liquid discharging";
+        else if (dispatch.socPct <= 15) fluid.className = "bess-liquid low";
+        else fluid.className = "bess-liquid";
+      }
+
+      renderSkyCanvas(h, elev);
+      renderCharts();
+      updateImageSolarEstimate();
+    }
+
+    /* Sky Sun/Moon Canvas & Interactive Dragging */
+    function renderSkyCanvas(hour, elevation) {
+      const canvas = document.getElementById("skyCanvas");
+      if (!canvas) return;
+
+      const isDay = elevation > 0;
+      const progress = hour / 24;
+      const cx = progress * 1000;
+      const cy = isDay ? 240 - (elevation / 90) * 190 : 250;
+
+      // Sky stops based on hour
+      let skyColor1 = '#030712';
+      let skyColor2 = '#0f172a';
+      if (hour >= 5 && hour < 8) { // Sunrise
+        skyColor1 = '#7c2d12'; skyColor2 = '#ea580c';
+      } else if (hour >= 8 && hour < 17) { // Daylight
+        skyColor1 = '#0369a1'; skyColor2 = '#38bdf8';
+      } else if (hour >= 17 && hour < 20) { // Sunset
+        skyColor1 = '#831843'; skyColor2 = '#f59e0b';
+      }
+
+      canvas.innerHTML = `
+    <defs>
+      <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fff" />
+        <stop offset="35%" stop-color="#ffb703" />
+        <stop offset="100%" stop-color="rgba(255,183,3,0)" />
+      </radialGradient>
+      <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${skyColor1}" />
+        <stop offset="100%" stop-color="${skyColor2}" />
+      </linearGradient>
+    </defs>
+    <rect width="1000" height="280" fill="url(#skyGrad)" />
+    <!-- Sun Trajectory Arc -->
+    <path d="M 0 250 Q 500 15 1000 250" fill="none" stroke="rgba(255,255,255,0.25)" stroke-dasharray="6,6" stroke-width="2"/>
+    ${isDay ? `
+      <g id="interactiveSun" style="cursor: grab;">
+        <circle cx="${cx}" cy="${cy}" r="45" fill="url(#sunGlow)" />
+        <circle cx="${cx}" cy="${cy}" r="16" fill="#ffffff" stroke="#ffb703" stroke-width="2"/>
+      </g>
+    ` : `
+      <g id="interactiveSun" style="cursor: grab;">
+        <circle cx="${cx}" cy="220" r="14" fill="#e2e8f0" opacity="0.9" />
+        <circle cx="${cx + 4}" cy="216" r="12" fill="${skyColor2}" />
+      </g>
+    `}
+  `;
+    }
+
+    // Add Interactive Sun Drag / Scrubbing
+    (function setupSunScrubber() {
+      const skyCanvas = document.getElementById("skyCanvas");
+      if (!skyCanvas) return;
+
+      let isDragging = false;
+
+      function updateTimeFromPointer(e) {
+        const rect = skyCanvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
+        const h = (x / rect.width) * 24;
+        document.getElementById("sliderHour").value = round(h, 1);
+        state.isLiveAuto = false;
+        document.getElementById("modeStateBadge").textContent = "MANUAL OVERRIDE";
+        document.getElementById("modeStateBadge").style.color = "var(--solar-gold)";
+        updateDashboardUI();
+      }
+
+      skyCanvas.addEventListener("mousedown", (e) => { isDragging = true; updateTimeFromPointer(e); });
+      window.addEventListener("mousemove", (e) => { if (isDragging) updateTimeFromPointer(e); });
+      window.addEventListener("mouseup", () => { isDragging = false; });
+
+      skyCanvas.addEventListener("touchstart", (e) => { isDragging = true; updateTimeFromPointer(e); }, { passive: true });
+      window.addEventListener("touchmove", (e) => { if (isDragging) updateTimeFromPointer(e); }, { passive: true });
+      window.addEventListener("touchend", () => { isDragging = false; });
+    })();
+
+    function renderCharts() {
+      const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
+      const solarData = [];
+      const loadData = [];
+      const ghiData = [];
+      const socData = [];
+
+      let simSoc = state.battery.socKwh;
+      const cloud = parseFloat(document.getElementById("sliderCloud").value);
+      const temp = parseFloat(document.getElementById("sliderTemp").value);
+      const hum = parseFloat(document.getElementById("sliderHumidity").value);
+
+      for (let i = 0; i < 24; i++) {
+        const s = computeSolarPower(i, cloud, temp, hum);
+        const l = computeLoadDemand(i);
+        solarData.push(round(s, 2));
+        loadData.push(round(l, 2));
+        ghiData.push(round(s * 100, 1));
+
+        const net = s - l;
+        if (net > 0) simSoc = Math.min(13.5, simSoc + Math.min(net, 5));
+        else simSoc = Math.max(1.35, simSoc - Math.min(-net, 5));
+        socData.push(Math.round(100 * simSoc / 13.5));
+      }
+
+      // Chart 1: Overview Chart
+      try {
+        const ctxOverview = document.getElementById("overviewChart");
+        if (ctxOverview && typeof Chart !== "undefined") {
+          if (overviewChartInstance) {
+            overviewChartInstance.data.datasets[0].data = solarData;
+            overviewChartInstance.data.datasets[1].data = loadData;
+            overviewChartInstance.update();
+          } else {
+            overviewChartInstance = new Chart(ctxOverview.getContext("2d"), {
+              type: 'line',
+              data: {
+                labels: hours,
+                datasets: [
+                  { label: 'Solar Generation (kW)', data: solarData, borderColor: '#ffb703', backgroundColor: 'rgba(255,183,3,0.15)', fill: true, tension: 0.4 },
+                  { label: 'Microgrid Load (kW)', data: loadData, borderColor: '#00f2fe', backgroundColor: 'transparent', borderDash: [5, 5], tension: 0.4 }
+                ]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 300 },
+                plugins: { legend: { labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 } } } },
+                scales: {
+                  x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } },
+                  y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } }
+                }
+              }
+            });
+          }
+        }
+      } catch (e) { console.error("Error rendering overview chart:", e); }
+
+      // Chart 2: Solar Irradiance
+      try {
+        const tabSolar = document.getElementById("tab-solar-forecast");
+        if (tabSolar && tabSolar.classList.contains("active")) {
+          const ctxSolar = document.getElementById("detailedSolarChart");
+          if (ctxSolar && typeof Chart !== "undefined") {
+            if (detailedChartInstance) {
+              detailedChartInstance.data.datasets[0].data = solarData;
+              detailedChartInstance.data.datasets[1].data = ghiData;
+              detailedChartInstance.update();
+            } else {
+              detailedChartInstance = new Chart(ctxSolar.getContext("2d"), {
+                type: 'bar',
+                data: {
+                  labels: hours,
+                  datasets: [
+                    { type: 'line', label: 'Solar Power (kW)', data: solarData, borderColor: '#ffb703', tension: 0.4, yAxisID: 'y' },
+                    { type: 'bar', label: 'Global Horizontal Irradiance (W/m²)', data: ghiData, backgroundColor: 'rgba(56, 189, 248, 0.4)', yAxisID: 'y1' }
+                  ]
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: { legend: { labels: { color: '#94a3b8' } } },
+                  scales: {
+                    y: { position: 'left', title: { display: true, text: 'kW', color: '#ffb703' } },
+                    y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'W/m²', color: '#38bdf8' } }
+                  }
+                }
+              });
+            }
+          }
+        }
+      } catch (e) { console.error("Error rendering detailed solar chart:", e); }
+
+      // Chart 3: BESS Storage
+      try {
+        const tabBess = document.getElementById("tab-bess-analytics");
+        if (tabBess && tabBess.classList.contains("active")) {
+          const ctxBess = document.getElementById("bessChart");
+          if (ctxBess && typeof Chart !== "undefined") {
+            if (bessChartInstance) {
+              bessChartInstance.data.datasets[0].data = socData;
+              bessChartInstance.update();
+            } else {
+              bessChartInstance = new Chart(ctxBess.getContext("2d"), {
+                type: 'line',
+                data: {
+                  labels: hours,
+                  datasets: [
+                    { label: 'Battery SoC (%)', data: socData, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.15)', fill: true, tension: 0.4 }
+                  ]
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  scales: { y: { min: 0, max: 100, ticks: { callback: v => `${v}%` } } }
+                }
+              });
+            }
+          }
+        }
+      } catch (e) { console.error("Error rendering BESS chart:", e); }
+    }
+
+    /* ==========================================================================
+       EVENT LISTENERS & HANDLERS
+       ========================================================================== */
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+        btn.classList.add("active");
+        const targetId = `tab-${btn.dataset.tab}`;
+        document.getElementById(targetId)?.classList.add("active");
+        setTimeout(renderCharts, 50);
+      });
+    });
+
+    ['sliderHour', 'sliderCloud', 'sliderTemp', 'sliderHumidity', 'sliderWind'].forEach(id => {
+      document.getElementById(id).addEventListener("input", () => {
+        state.isLiveAuto = false;
+        document.getElementById("modeStateBadge").textContent = "MANUAL OVERRIDE";
+        document.getElementById("modeStateBadge").style.color = "var(--solar-gold)";
+        updateDashboardUI();
+      });
+    });
+
+    document.getElementById("resyncLiveBtn").addEventListener("click", () => {
+      state.isLiveAuto = true;
+      state.weather.ghiSource = "live";
+      document.getElementById("modeStateBadge").textContent = "LIVE SYNC";
+      document.getElementById("modeStateBadge").style.color = "var(--emerald-battery)";
+      document.getElementById("weatherPanelTitle").textContent = "Satellite Meteorological Data";
+      document.getElementById("weatherSourceBadge").textContent = "LIVE";
+      document.getElementById("weatherSourceBadge").style.color = "var(--solar-gold)";
+      fetchLiveSatelliteWeather(state.lat, state.lon, state.cityName);
+    });
+
+    document.getElementById("gpsDetectBtn").addEventListener("click", autoDetectUserLocation);
+
+    // Preset location selection
+    document.querySelectorAll(".preset-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll(".preset-chip").forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        const lat = parseFloat(chip.dataset.lat);
+        const lon = parseFloat(chip.dataset.lon);
+        const name = chip.dataset.name;
+        fetchLiveSatelliteWeather(lat, lon, name);
+      });
+    });
+
+    // Search input
+    document.getElementById("citySearchInput").addEventListener("keypress", async (e) => {
+      if (e.key === "Enter") {
+        const q = e.target.value.trim();
+        if (!q) return;
+        try {
+          const resp = await fetch(`/api/weather/geocode?query=${encodeURIComponent(q)}`);
+          const data = await resp.json();
+          if (data.results && data.results.length > 0) {
+            const item = data.results[0];
+            fetchLiveSatelliteWeather(item.lat, item.lon, item.name);
+          }
+        } catch (err) {
+          console.log("Geocode search error:", err);
+        }
+      }
+    });
+
+    async function classifyWeatherImage(file) {
+      if (!file) return;
+
+      const fileName = document.getElementById("weatherFileName");
+      const resultClass = document.getElementById("weatherAiClass");
+      const resultMeta = document.getElementById("weatherAiMeta");
+      fileName.textContent = file.name;
+      resultClass.textContent = "Analysing image...";
+      resultMeta.textContent = "Running the trained weather classifier.";
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      try {
+        const response = await fetch("/api/weather/image", { method: "POST", body: formData });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Image classification failed.");
+
+        const profile = data.profile;
+        state.weather.cloud = profile.cloud_cover_pct;
+        state.weather.temp = profile.temperature_c;
+        state.weather.humidity = profile.humidity_pct;
+        state.weather.wind = profile.wind_speed_kmh;
+        state.weather.ghi = profile.ghi_wm2;
+        state.weather.dni = profile.ghi_wm2 * 0.8;
+        state.weather.dhi = profile.ghi_wm2 * 0.2;
+        state.weather.isDay = data.predicted_class !== "night" ? 1 : 0;
+        state.weather.ghiSource = "image";
+        state.forecast24h = [];
+        state.isLiveAuto = false;
+        state.cityName = `AI Weather: ${data.predicted_class}`;
+
+        document.getElementById("currentCityName").textContent = state.cityName;
+        document.getElementById("currentCoords").textContent = "Source: uploaded image classifier";
+        document.getElementById("weatherPanelTitle").textContent = "Image-Derived Meteorological Data";
+        document.getElementById("weatherSourceBadge").textContent = "IMAGE AI";
+        document.getElementById("weatherSourceBadge").style.color = "var(--violet-ai)";
+        document.getElementById("sliderCloud").value = profile.cloud_cover_pct;
+        document.getElementById("sliderTemp").value = profile.temperature_c;
+        document.getElementById("sliderHumidity").value = profile.humidity_pct;
+        document.getElementById("sliderWind").value = profile.wind_speed_kmh;
+        document.getElementById("modeStateBadge").textContent = "IMAGE AI";
+        document.getElementById("modeStateBadge").style.color = "var(--violet-ai)";
+        const preview = document.getElementById("weatherAiPreview");
+        if (preview) {
+          if (preview.dataset.objectUrl) URL.revokeObjectURL(preview.dataset.objectUrl);
+          preview.dataset.objectUrl = URL.createObjectURL(file);
+          preview.src = preview.dataset.objectUrl;
+          preview.style.display = "block";
+        }
+        resultClass.textContent = data.predicted_class.replaceAll("_", " ");
+        resultMeta.textContent = `${data.confidence_pct}% model confidence • ${profile.cloud_cover_pct}% cloud cover • ${profile.ghi_wm2} W/m² estimated GHI`;
+        updateDashboardUI();
+        showToast(`Weather updated from ${data.predicted_class.replaceAll("_", " ")} image.`);
+      } catch (error) {
+        resultClass.textContent = "Prediction unavailable";
+        resultMeta.textContent = error.message;
+        showToast(error.message);
+      }
+    }
+
+    const weatherImageInput = document.getElementById("weatherImageInput");
+    const weatherUploadButton = document.getElementById("weatherUploadButton");
+    const weatherUploadZone = document.getElementById("weatherUploadZone");
+    weatherUploadButton.addEventListener("click", () => weatherImageInput.click());
+    weatherImageInput.addEventListener("change", () => classifyWeatherImage(weatherImageInput.files[0]));
+    ["dragenter", "dragover"].forEach(eventName => weatherUploadZone.addEventListener(eventName, event => {
+      event.preventDefault();
+      weatherUploadZone.classList.add("dragging");
+    }));
+    ["dragleave", "drop"].forEach(eventName => weatherUploadZone.addEventListener(eventName, event => {
+      event.preventDefault();
+      weatherUploadZone.classList.remove("dragging");
+    }));
+    weatherUploadZone.addEventListener("drop", event => {
+      classifyWeatherImage(event.dataTransfer.files[0]);
+    });
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      if (!toast) return;
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => toast.classList.remove("show"), 2800);
+    }
+
+    // Export CSV
+    document.getElementById("exportCsvBtn").addEventListener("click", () => {
+      let csv = "Hour,Time,Predicted_Solar_kW,Load_Demand_kW,GHI_Wm2,Temp_C,Cloud_Cover_Pct,Battery_SoC_Pct\n";
+      Array.from({ length: 24 }, (_, i) => i).forEach(h => {
+        const s = computeSolarPower(h, state.weather.cloud, state.weather.temp, state.weather.humidity);
+        const l = computeLoadDemand(h);
+        csv += `${h},${h}:00,${round(s, 3)},${round(l, 3)},${round(s * 100, 1)},${state.weather.temp},${state.weather.cloud},65\n`;
+      });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
+      link.download = `SolarEnergyForecasting_Telemetry_${state.cityName.replace(/\s+/g, "_")}_24h.csv`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+      showToast("24-hour telemetry CSV exported.");
+    });
+
+    // PDF action is registered once at boot, not inside the CSV handler.
+    document.getElementById("downloadPdfBtn").addEventListener("click", () => {
+      window.open("/api/download/pdf", "_blank", "noopener");
+      showToast("Opening the parameters guide.");
+    });
+
+    // Interactive Appliance Smart Toggles (EV, HVAC, Kitchen, IoT)
+    ["toggleEvBtn", "toggleHvacBtn", "toggleKitchenBtn", "toggleIotBtn"].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener("click", () => {
+        const app = el.dataset.appliance;
+        state.appliances[app] = !state.appliances[app];
+        el.classList.toggle("active", state.appliances[app]);
+        const span = el.querySelector("span");
+        if (span) {
+          span.textContent = state.appliances[app] ? "[ACTIVE]" : "[OFF]";
+          span.style.color = state.appliances[app] ? "var(--emerald-battery)" : "var(--coral-grid)";
+        }
+        updateDashboardUI();
+        showToast(`${app.toUpperCase()} load ${state.appliances[app] ? "enabled" : "paused"}.`);
+      });
+    });
+
+    // Initial boot
+    autoDetectUserLocation();
+  </script>
+</body>
+
+</html>

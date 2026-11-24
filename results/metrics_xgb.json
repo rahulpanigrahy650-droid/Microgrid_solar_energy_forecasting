@@ -1,0 +1,22 @@
+{
+  "mae_kw": 0.0111,
+  "rmse_kw": 0.0235,
+  "r2": 0.999923,
+  "model": "XGBRegressor",
+  "train_rows": 73030,
+  "test_rows": 14642,
+  "features": [
+    "hour_sin",
+    "hour_cos",
+    "day_sin",
+    "day_cos",
+    "temperature_c",
+    "humidity_pct",
+    "cloud_cover_pct",
+    "wind_speed_kmh",
+    "ghi_wm2",
+    "prev_solar_kw",
+    "solar_lag_24h",
+    "solar_roll_3h"
+  ]
+}
